@@ -10,7 +10,15 @@ from api.serializers import PostSerializer, GroupSerializer, CommentSerializer
 
 class PostViewSet(viewsets.ModelViewSet):
     # @action(methods=['get'], detail=True)
-    def get(request, pk):
+    def get_queryset(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
+        posts = Post.objects.all()
+        
+        if request.method == 'GET':
+            return post
+        return posts
+    
+    def get(self, request, pk):
         if request.user.is_authenticated():
             post = get_object_or_404(Post, id=pk)
             serializer = PostSerializer(post, many=False)
@@ -18,7 +26,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # @action(methods=['post'], detail=True)
-    def create(request):
+    def create(self, request):
         if request.user.is_authenticated():
             serializer = PostSerializer(data=request.data)
             if serializer.is_valid():
@@ -29,16 +37,16 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
     # @action(methods=['update'], detail=True)
-    def update(request, pk):
+    def update(self, request, pk):
         post = get_object_or_404(Post, id=pk)
         if request.user == post.author and request.user.is_authenticated():
-            serializer = PostSerializer(post, many=False)
+            serializer = PostSerializer(post, many=False, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # @action(methods=['list'], detail=True)
-    def list(request):
+    def list(self, request):
         if request.user.is_authenticated():
             posts = Post.objects.all()
             serializer = PostSerializer(posts, many=True)
@@ -46,7 +54,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # @action(methods=['delete'], detail=True)
-    def delete(request, pk):
+    def delete(self, request, pk):
         post = get_object_or_404(Post, id=pk)
         if request.user == post.author:
             serializer = PostSerializer(post, many=False)
@@ -58,7 +66,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ModelViewSet):
     
     # @action(methods=['get'], detail=True)
-    def get(request, pk):
+    def get(self, request, pk):
         if request.user.is_authenticated():
             group = get_object_or_404(Group, id=pk)
             serializer = GroupSerializer(group, many=False)
@@ -66,24 +74,25 @@ class GroupViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
     # @action(methods=['list'], detail=True)
-    def list(request):
+    def list(self, request):
         if request.user.is_authenticated():
             groups = Group.objects.all()
             serializer = GroupSerializer(groups, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
+    def get_serializer_class(self):
+        pass
 
 class CommentViewSet(viewsets.ModelViewSet):
     # @action(methods=['get'], detail=True)
-    def get(request, pk):
+    def get(self, request, pk):
         if request.user.is_authenticated():
             comment = get_object_or_404(Comment, id=pk)
             serializer = CommentSerializer(comment, many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     # @action(methods=['list'], detail=True)
-    def list(request):
+    def list(self, request):
         if request.user.is_authenticated():
             comments = Comment.objects.all()
             serializer = GroupSerializer(comments, many=True)
@@ -91,7 +100,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
     # @action(methods=['post'], detail=True)
-    def create(request):
+    def create(self, request):
         if request.user.is_authenticated():
             serializer = CommentSerializer(data=request.data)
             if serializer.is_valid():
@@ -99,6 +108,9 @@ class CommentViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    def get_serializer_class(self):
+        pass
 
 
 
