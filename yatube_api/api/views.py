@@ -1,7 +1,7 @@
 from django.shortcuts import render,  get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.decorators import action
 from rest_framework import viewsets
 
 from posts.models import Post, Group, Comment
@@ -9,16 +9,15 @@ from api.serializers import PostSerializer, GroupSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-
+    @action(methods=['get'], detail=True)
     def get(request):
         if request.user.is_authenticated():
             post = Post.objects.all()
             serializer = PostSerializer(post, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
+    
+    @action(methods=['post', 'update'], detail=True)
     def create(request):
         if request.user.is_authenticated():
             serializer = PostSerializer(data=request.data)
@@ -26,7 +25,8 @@ class PostViewSet(viewsets.ModelViewSet):
                 serializer.save(author=request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    # @action(methods=['update'], detail=True)
     def update(request, post_id):
         post = get_object_or_404(Post, id=post_id)
         if request.user == post.author and request.user.is_authenticated():
@@ -35,7 +35,8 @@ class PostViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    @action(methods=['delete'], detail=True)
     def delete(request, post_id):
         post = get_object_or_404(Post, id=post_id)
         if request.user == post.author:
