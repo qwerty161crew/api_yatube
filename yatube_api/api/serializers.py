@@ -3,6 +3,7 @@ from posts.models import Post, Group, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
+    group = serializers.SlugRelatedField(slug_field='slug', queryset=Group.objects.all(), required=False)
     class Meta:
         model = Post
         field = ('id', 'text', 'author', 'image', 'group', 'pub_date')
