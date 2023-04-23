@@ -61,6 +61,7 @@ class TestCommentAPI:
             '`/api/v1/posts/{post.id}/comments/` возвращаются данные в виде '
             'списка.'
         )
+        print(test_data)
         assert len(test_data) == Comment.objects.filter(post=post).count(), (
             'Проверьте, что при GET-запросе авторизованного пользователя к '
             '`/api/v1/posts/{post.id}/comments/` возвращаются данные обо '

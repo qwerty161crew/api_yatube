@@ -1,12 +1,13 @@
 from django.urls import path, include
 from rest_framework.authtoken import views
 from .views import PostViewSet, GroupViewSet, CommentViewSet
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
 
-router = DefaultRouter()
+router = SimpleRouter()
 router.register('api/v1/posts', PostViewSet, basename='post') 
 router.register('api/v1/groups', GroupViewSet, basename='group')
 router.register(r'api/v1/posts/(?P<post_id>\d+)/comments', CommentViewSet, basename='comment')
+print(router.urls)
 
 
 app_name = 'api'
