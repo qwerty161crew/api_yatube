@@ -29,6 +29,7 @@ class TestPostAPI:
                         request_method_and_url,
                         db_post=None):
         expected_fields = ('id', 'text', 'author', 'pub_date')
+        print(f"ooooo {response_data}")
         for field in expected_fields:
             assert field in response_data, (
                 'Проверьте, что для авторизованного пользователя ответ на '

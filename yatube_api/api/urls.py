@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register('api/v1/posts', PostViewSet, basename='post') 
 router.register('api/v1/groups', GroupViewSet, basename='group')
 router.register(r'api/v1/posts/(?P<post_id>\d+)/comments', CommentViewSet, basename='comment')
-print(router.urls)
+
 
 app_name = 'api'
 
