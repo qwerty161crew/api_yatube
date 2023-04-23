@@ -19,7 +19,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    author = serializers.StringRelatedField(many=False, read_only=True)
 
     class Meta:
         model = Comment
