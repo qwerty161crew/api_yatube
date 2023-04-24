@@ -40,5 +40,6 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.validated_data["author"] = self.request.user
-        serializer.validated_data["post"] = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        serializer.validated_data["post"] = get_object_or_404(
+            Post, pk=self.kwargs.get('post_id'))
         super().perform_create(serializer)
