@@ -1,8 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
-from posts.models import Post, Group, Comment
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from posts.models import Post, Group
 from api.serializers import PostSerializer, GroupSerializer, CommentSerializer
 from .permissions import AuthorDeleteOnly
 from django.shortcuts import get_object_or_404
@@ -36,3 +37,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         return post.comments
+
+    def perform_create(self, serializer):
+        serializer.validated_data["author"] = self.request.user
+        super().perform_create(serializer)
