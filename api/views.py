@@ -10,7 +10,6 @@ from api.serializers import PostSerializer, GroupSerializer, CommentSerializer
 from .permissions import AuthorCreateorDeleteOnly
 
 
-
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -19,7 +18,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.validated_data["author"] = self.request.user
-        super().perform_create(serializer)
+        serializer.save()
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -28,6 +27,8 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthenticated)
 
     def create(self, request, *args, **kwargs):
+        # тут не совсем понял. Есть какой-то встроенный класс
+        # или мне самому прописать?
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -38,10 +39,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        return post.comments
+        return post.comments.all()
 
     def perform_create(self, serializer):
         serializer.validated_data["author"] = self.request.user
         serializer.validated_data["post"] = get_object_or_404(
             Post, pk=self.kwargs.get('post_id'))
-        super().perform_create(serializer)
+        serializer.save()
