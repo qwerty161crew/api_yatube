@@ -1,5 +1,3 @@
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -17,19 +15,13 @@ class PostViewSet(viewsets.ModelViewSet):
                           IsAuthenticated, AuthorCreateorDeleteOnly)
 
     def perform_create(self, serializer):
-        serializer.validated_data["author"] = self.request.user
-        serializer.save()
+        # serializer.validated_data["author"] = self.request.user
+        serializer.save(author=self.request.user)
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthenticated)
-
-    def create(self, request, *args, **kwargs):
-        # тут не совсем понял. Есть какой-то встроенный класс
-        # или мне самому прописать?
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -42,7 +34,5 @@ class CommentViewSet(viewsets.ModelViewSet):
         return post.comments.all()
 
     def perform_create(self, serializer):
-        serializer.validated_data["author"] = self.request.user
-        serializer.validated_data["post"] = get_object_or_404(
-            Post, pk=self.kwargs.get('post_id'))
-        serializer.save()
+        serializer.save(author=self.request.user, post=get_object_or_404(
+            Post, pk=self.kwargs.get('post_id')))
